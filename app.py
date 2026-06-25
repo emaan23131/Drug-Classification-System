@@ -2,19 +2,20 @@ import streamlit as st
 import pandas as pd
 import joblib
 
-# Load saved model and encoders
-model = joblib.load("drug_model.pkl")
+# Load files
+model = joblib.load("models/knn_model.pkl")
+encoders = joblib.load("models/encoders.pkl")
+drug_encoder = joblib.load("models/drug_encoder.pkl")
+scaler = joblib.load("models/scaler.pkl")
 
-le_sex = joblib.load("le_sex.pkl")
-le_bp = joblib.load("le_bp.pkl")
-le_cholesterol = joblib.load("le_cholesterol.pkl")
-le_drug = joblib.load("le_drug.pkl")
-
-# Page title
-st.set_page_config(page_title="Drug Classifier", page_icon="💊")
+# Page settings
+st.set_page_config(
+    page_title="Drug Classification System",
+    page_icon="💊"
+)
 
 st.title("💊 Drug Classification System")
-st.write("Enter patient information to predict the recommended drug.")
+st.write("Enter patient details to predict the recommended drug.")
 
 # Inputs
 age = st.number_input(
@@ -47,9 +48,9 @@ na_to_k = st.number_input(
 
 if st.button("Predict Drug"):
 
-    sex_encoded = le_sex.transform([sex])[0]
-    bp_encoded = le_bp.transform([bp])[0]
-    chol_encoded = le_cholesterol.transform([cholesterol])[0]
+    sex_encoded = encoders["Sex"].transform([sex])[0]
+    bp_encoded = encoders["BP"].transform([bp])[0]
+    chol_encoded = encoders["Cholesterol"].transform([cholesterol])[0]
 
     input_data = pd.DataFrame({
         "Age": [age],
@@ -59,8 +60,10 @@ if st.button("Predict Drug"):
         "Na_to_K": [na_to_k]
     })
 
-    prediction = model.predict(input_data)
+    input_scaled = scaler.transform(input_data)
 
-    predicted_drug = le_drug.inverse_transform(prediction)[0]
+    prediction = model.predict(input_scaled)
 
-    st.success(f"Recommended Drug: {predicted_drug}")
+    predicted_drug = drug_encoder.inverse_transform(prediction)[0]
+
+    st.success(f"💊 Recommended Drug: {predicted_drug}")
