@@ -3,10 +3,10 @@ import pandas as pd
 import joblib
 
 # Load files
-model = joblib.load("models/knn_model.pkl")
-encoders = joblib.load("models/encoders.pkl")
-drug_encoder = joblib.load("models/drug_encoder.pkl")
-scaler = joblib.load("models/scaler.pkl")
+model = joblib.load("knn_model.pkl")
+encoders = joblib.load("encoders.pkl")
+drug_encoder = joblib.load("drug_encoder.pkl")
+scaler = joblib.load("scaler.pkl")
 
 # Page settings
 st.set_page_config(
